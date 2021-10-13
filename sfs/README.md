@@ -1,0 +1,1 @@
+#this folder documents how we calculate sfs (site frequency spectrum) of derived alleles in  [sofos](https://github.com/CartwrightLab/SoFoS). Sofos takes into account the sample size of each population. The unequal size of each population would bias our estimate of sfs, as bigger populations are more likely to have higher frequency of low-frequency alleles. 

@@ -1,0 +1,53 @@
+---
+title: "Li Wang's data: GTCB results from Gen Xu"
+output: NULL
+date: 05-26-2021
+---
+
+```{r setup, include=TRUE}
+#setwd("~/Documents/Github/pvpDiallel/")
+knitr::opts_knit$set(root.dir=normalizePath('../../'))
+```
+
+### Plot Results
+
+
+```{r}
+res <- read.csv("cache/PVP350_gctb_res.csv")
+
+s <- subset(res, par %in% "S")
+s$trait <-  gsub("_.*", "", s$trait)
+```
+
+
+```{r}
+library("tidyverse")
+library("ggrepel")
+
+s <- s[order(s$Mean, decreasing = FALSE),]
+s$trait <- factor(s$trait, levels = s$trait)
+p <- ggplot(s, 
+            aes(x=trait, y=Mean)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=Mean-SD, ymax=Mean+SD), colour="grey", linetype=1) +
+  coord_flip() +
+  xlab("") +
+  ylab("S (mean +/- sd)") +
+  ggtitle("") +
+  theme_classic() +
+    #labs(color = "") +
+    #scale_y_continuous(limits = c(-0.01, 1)) +
+    geom_hline(yintercept=0, linetype="dashed", color = "red") +
+    theme(plot.title = element_text(size=20, face = "bold"), 
+          axis.text=element_text(size=16, face="bold"),
+          #strip.text.x = element_text(size = 16, face = "bold"),
+          axis.title=element_text(size=18, face="bold"),
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.position = "top", 
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.title = element_text(size=18, face="bold"),
+          legend.text = element_text(size=18))
+
+p
+```
+

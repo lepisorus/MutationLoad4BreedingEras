@@ -1,0 +1,29 @@
+1000               # number of iterations 
+1.0 2.0 7.0        # Starting values of VA, VD and VE 
+1.0e-08            # tolerance level 
+BLUP_traits.sorted2.txt    # phenotype file
+2                  # trait position in phenotype file 
+0                  # number of fixed factors
+0                  # positions of fixed factors in phenotype file
+0                  # number of covariables 
+0                  # positions of covariables in phenotype file 
+350                # number of individuals genotyped
+10                  # number of chromosomes
+3298475 chr1.SNPs.t.sampleid.txt    # genotype file for each chromosome
+2522764 chr2.SNPs.t.sampleid.txt    # genotype file for each chromosome
+2478336 chr3.SNPs.t.sampleid.txt    # genotype file for each chromosome
+2463354 chr4.SNPs.t.sampleid.txt   # genotype file for each chromosome
+2106433 chr5.SNPs.t.sampleid.txt   # genotype file for each chromosome
+1770093 chr6.SNPs.t.sampleid.txt   # genotype file for each chromosome
+1832404 chr7.SNPs.t.sampleid.txt   # genotype file for each chromosome
+1783718 chr8.SNPs.t.sampleid.txt   # genotype file for each chromosome
+1704204 chr9.SNPs.t.sampleid.txt   # genotype file for each chromosome
+1524243 chr10.SNPs.t.sampleid.txt   # genotype file for each chromosome
+output_greml_ce_2    # output file for GREML
+output_gblup_ce_2    # output file for GBLUP
+def_Q              1  # definition of genetic relationship 
+use_ai_reml        1
+#iter_ai_reml_start 3
+#missing_phen_val   -999
+#map_file           map.txt
+output_mrk_effect  output_snpeff_ce_2.snpe

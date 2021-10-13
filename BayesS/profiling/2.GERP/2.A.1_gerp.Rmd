@@ -1,0 +1,183 @@
+---
+title: "Li Wang's data: GTCB results from Gen Xu"
+output: NULL
+date: 05-26-2021
+---
+
+```{r setup, include=TRUE}
+#setwd("~/Documents/Github/pvpDiallel/")
+knitr::opts_knit$set(root.dir=normalizePath('../../'))
+```
+
+
+## GCTB SNP effects
+
+```{r}
+library("data.table")
+
+g <- fread("/common/jyanglab/shared/dbcenter/LWang/sampleGeno/120hybridGenotype_allChr_SorghumAllele_GERP_complete.txt", data.table=FALSE)
+# 25318250      125
+
+df <- g[, 1:6]
+names(df) <- c("chr", "pos", "sorghum", "GERP", "alleles", "snpid")
+df$snpid <- paste(df$chr, df$pos, sep="_")
+fwrite(df, "largedata/gerp_snps.csv", sep=",", row.names=FALSE, quote=FALSE)
+```
+
+### Effect Size
+
+```{r}
+eff <- read.csv("cache/master_SNP_effects.csv")
+
+ed <- merge(eff, df, by.x="Name", by.y="snpid")
+dim(ed) # 254604     13
+fwrite(ed, "cache/gerp_snps_effects.csv", sep=",", row.names=FALSE, quote=FALSE)
+```
+
+
+----------------------------------------------------
+
+```{r}
+library(data.table)
+ed <- fread("cache/gerp_snps_effects.csv", data.table=FALSE)
+ed$type <- "GERP0"
+ed[ed$GERP > 4, ]$type <- "GERP4"
+ed[ed$GERP > 2 & ed$GERP <= 4, ]$type <- "GERP24"
+ed[ed$GERP > 0 & ed$GERP <= 2, ]$type <- "GERP02"
+
+library(plyr)
+stat <- ddply(ed, .(trait, type), summarise,
+              meff = mean(A1Effect),
+              mfrq = mean(A1Frq))
+```
+
+calculate ancestor allele freq
+
+```{r}
+ed$ancfrq <- -9
+#if A1 == sorghum
+ed[ed$A1 == ed$sorghum, ]$ancfrq <- ed[ed$A1 == ed$sorghum, ]$A1Frq
+ed[ed$A2 == ed$sorghum, ]$ancfrq <- 1- ed[ed$A2 == ed$sorghum, ]$A1Frq
+
+```
+
+------------------
+# GERP >0 vs. GERP <0
+
+```{r}
+ed$dtype <- "GERP>0"
+ed[ed$GERP <=0, ]$dtype <- "GERP<=0"
+
+p0 <- ggplot(ed, aes(x=type, y=log10(A1Effect), fill=type)) +
+    geom_boxplot() +
+    #geom_jitter() +
+    facet_wrap(.~trait, ncol=4, scales = "free_y") +
+    xlab("") +
+    ylab("Effect Size (log10)") +
+    ggtitle("") +
+    theme_classic() +
+    #labs(color = "") +
+    #scale_y_continuous(limits = c(-0.01, 1)) +
+    #geom_vline(xintercept=0, linetype="dashed", color = "red") +
+    theme(plot.title = element_text(size=20, face = "bold"), 
+          axis.text=element_text(size=16, face="bold"),
+          strip.text.x = element_text(size = 16, face = "bold"),
+          axis.title=element_text(size=18, face="bold"),
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.position = "none", 
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.title = element_text(size=18, face="bold"),
+          legend.text = element_text(size=18))
+
+p0
+```
+
+
+
+
+
+
+
+
+------------------
+```{r}
+library(ggplot2)
+p1 <- ggplot(subset(ed, ancfrq > 0), aes(x=type, y=A1Effect)) +
+    geom_boxplot() +
+    geom_jitter() +
+    facet_wrap(.~trait, ncol=4, scales = "free_y") +
+    xlab("") +
+    ylab("Heritability") +
+    ggtitle("") +
+    theme_classic() +
+    #labs(color = "") +
+    #scale_y_continuous(limits = c(-0.01, 1)) +
+    #geom_vline(xintercept=0, linetype="dashed", color = "red") +
+    theme(plot.title = element_text(size=20, face = "bold"), 
+          axis.text=element_text(size=16, face="bold"),
+          strip.text.x = element_text(size = 16, face = "bold"),
+          axis.title=element_text(size=18, face="bold"),
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.position = "none", 
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.title = element_text(size=18, face="bold"),
+          legend.text = element_text(size=18))
+
+p1
+```
+
+### Positive Selection
+
+```{r}
+lau <- subset(ed, trait %in% "LAU" & ancfrq > 0)
+p2 <- ggplot(lau, aes(x=ancfrq, y=A1Effect)) +
+    geom_point() +
+    #geom_jitter() +
+    facet_wrap(.~type, ncol=4, scales = "fixed") +
+    xlab("") +
+    ylab("Effect Size") +
+    ggtitle("") +
+    theme_classic() +
+    #labs(color = "") +
+    #scale_y_continuous(limits = c(-0.01, 1)) +
+    #geom_vline(xintercept=0, linetype="dashed", color = "red") +
+    theme(plot.title = element_text(size=20, face = "bold"), 
+          axis.text=element_text(size=16, face="bold"),
+          strip.text.x = element_text(size = 16, face = "bold"),
+          axis.title=element_text(size=18, face="bold"),
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.position = "none", 
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.title = element_text(size=18, face="bold"),
+          legend.text = element_text(size=18))
+
+p2
+```
+
+### Negative Selection
+
+```{r}
+dta <- subset(ed, trait %in% "DTA")
+p3 <- ggplot(dta, aes(x=A1Frq, y=A1Effect)) +
+    geom_point() +
+    #geom_jitter() +
+    facet_wrap(.~type, ncol=4, scales = "fixed") +
+    xlab("") +
+    ylab("Effect Size") +
+    ggtitle("") +
+    theme_classic() +
+    #labs(color = "") +
+    #scale_y_continuous(limits = c(-0.01, 1)) +
+    #geom_vline(xintercept=0, linetype="dashed", color = "red") +
+    theme(plot.title = element_text(size=20, face = "bold"), 
+          axis.text=element_text(size=16, face="bold"),
+          strip.text.x = element_text(size = 16, face = "bold"),
+          axis.title=element_text(size=18, face="bold"),
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.position = "none", 
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.title = element_text(size=18, face="bold"),
+          legend.text = element_text(size=18))
+
+p3
+```

@@ -1,0 +1,59 @@
+---
+title: "Li Wang's data: GTCB results from Gen Xu"
+output: NULL
+date: 05-26-2021
+---
+
+```{r setup, include=TRUE}
+#setwd("~/Documents/Github/pvpDiallel/")
+knitr::opts_knit$set(root.dir=normalizePath('../../'))
+```
+
+
+## GCTB SNP effects
+
+get top non-zero SNPs from tthe GCTB results
+
+```{r}
+library("data.table")
+
+getsnpeff <- function(df=HN, outfile="cache/snpeff/eff_"){
+  nz <- subset(df, par %in% "NnzSnp")
+  for(i in 1:nrow(nz)){
+    
+    file <- gsub("parRes", "snpRes", nz$file[i])
+    snp <- fread(file)
+    snp <- snp[order(snp$A1Effect, decreasing = TRUE),]
+    snp0 <- snp[1:round(nz$Mean[i]),]
+    
+    aid <- gsub(".*\\/|.parRes", "", nz$file[i])
+    fwrite(snp0, paste0(outfile, aid, ".csv"), sep=",", row.names=FALSE, quote=FALSE)
+  }
+}
+
+d <- read.csv("cache/PVP350_gctb_res.csv")
+
+nz <- subset(d, par %in% "NnzSnp")
+  
+getsnpeff(df=d, outfile="cache/snpeff/eff_")  
+
+
+```
+
+
+### Generate a master file
+
+```{r}
+files <- list.files(path="cache/snpeff/", pattern="csv", full.names = T)
+
+out <- data.frame()
+for(i in 1:length(files)){
+  dt <- read.csv(files[i]) 
+  dt$file <- files[i]
+  out <- rbind(out, dt)
+}
+
+out$trait <- gsub(".*\\/|_BLUP.csv|eff_", "", out$file)
+write.csv(out, "cache/master_SNP_effects.csv", row.names = FALSE, quote=FALSE)
+```
+

@@ -1,0 +1,101 @@
+---
+title: "Li Wang's data: GTCB results from Gen Xu"
+output: NULL
+date: 05-26-2021
+---
+
+```{r setup, include=TRUE}
+#setwd("~/Documents/Github/pvpDiallel/")
+knitr::opts_knit$set(root.dir=normalizePath('../../'))
+```
+
+
+## GCTB SNP effects
+
+```{r}
+res <- read.csv("cache/PVP350_gctb_res.csv")
+names(res) <- c("value", "sd", "Type", "file", "trait")
+res$treatment <- "Ag"
+
+m <- read.csv("cache/gctb_micro.csv")
+m$trait <- gsub(".*\\/|.parRes", "", m$file)
+
+df <- rbind(res[, c("Type", "value", "sd", "trait", "treatment")], m[, c("Type", "value", "sd", "trait", "treatment")])
+
+write.table(df, "cache/gtcb_micro_ag.csv", sep=",", row.names = FALSE, quote=FALSE)
+```
+
+### comparison
+
+```{r}
+df <- read.csv("cache/gtcb_micro_ag.csv")
+
+h2 <- subset(df, Type %in% "hsq")
+
+nz <- subset(df, Type %in% "NnzSnp")
+```
+
+
+
+
+```{r}
+snp0 <- read.csv("cache/snpeff/eff_LW_BLUP.csv")
+snp0 <- snp0[1:3000,]
+
+library(ggplot2)
+p1 <- p<-ggplot(h2, aes(x=treatment, y=value)) +
+      geom_violin(trim=FALSE, fill='#A4A4A4', color="darkred")+
+    geom_boxplot(width=0.1) +
+    xlab("") +
+    ylab("Heritability") +
+    ggtitle("") +
+    theme_classic() +
+    #labs(color = "") +
+    #scale_y_continuous(limits = c(-0.01, 1)) +
+    #geom_vline(xintercept=0, linetype="dashed", color = "red") +
+    theme(plot.title = element_text(size=20, face = "bold"), 
+          axis.text=element_text(size=16, face="bold"),
+          strip.text.x = element_text(size = 16, face = "bold"),
+          axis.title=element_text(size=18, face="bold"),
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.position = "none", 
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.title = element_text(size=18, face="bold"),
+          legend.text = element_text(size=18))
+
+p1
+```
+
+
+```{r}
+df <- read.csv("cache/gtcb_micro_ag.csv")
+
+nz <- subset(df, Type %in% "NnzSnp")
+idx <- which(nz$treatment != "Ag" & nz$value > 20000)
+nz <- nz[-idx,]
+```
+
+
+```{r}
+p2 <- p<-ggplot(nz, aes(x=treatment, y=value)) +
+      geom_violin(trim=FALSE, fill='#A4A4A4', color="darkred")+
+    geom_boxplot(width=0.1) +
+    xlab("") +
+    ylab("Polygenicity (non Zero SNPs)") +
+    ggtitle("") +
+    theme_classic() +
+    #labs(color = "") +
+    #scale_y_continuous(limits = c(-0.01, 1)) +
+    #geom_vline(xintercept=0, linetype="dashed", color = "red") +
+    theme(plot.title = element_text(size=20, face = "bold"), 
+          axis.text=element_text(size=16, face="bold"),
+          strip.text.x = element_text(size = 16, face = "bold"),
+          axis.title=element_text(size=18, face="bold"),
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.position = "none", 
+          #axis.text.x = element_text(angle = 20, hjust=0.6),
+          legend.title = element_text(size=18, face="bold"),
+          legend.text = element_text(size=18))
+
+p2
+```

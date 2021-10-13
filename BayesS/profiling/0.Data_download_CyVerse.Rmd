@@ -1,0 +1,48 @@
+---
+title: "Li Wang's data"
+output: NULL
+date: 04-28-2021
+---
+
+Hi, Jinliang
+I just shared with you the phenotype and genotype data of 350 inbred lines and 120 hybrids on cyverse.
+Genotypes are here: /iplant/home/lilepisorus/load60yearsBreeding/sampleGeno （notes.txt file in the directory gives some notes of the shared files）
+Phenotypes are here: /iplant/home/lilepisorus/load60yearsBreeding/sampleInfo 
+You could also give me your student’s cyverse id / email address. I will give him/her access to the folders
+Appreciate your contributions!
+Best
+Li
+
+
+```{bash, eval=FALSE}
+module load irods
+# login Cyverse
+iinit
+# input password.
+
+cd /common/jyanglab/shared/dbcenter/LWang
+irsync -rKV i:/iplant/home/lilepisorus/load60yearsBreeding/sampleGeno .
+
+/common/jyanglab/shared/dbcenter/LWang/
+
+irsync -rKV i:/iplant/home/lilepisorus/load60yearsBreeding/sampleInfo .
+```
+
+### 8-17-2021
+
+金良，王老师那边又分享了四个产量相关的性状，我把它们upload到  `/iplant/home/lilepisorus/load60yearsBreeding/sampleInfo/Ear_BLUPs_3Env.txt`  这里，你应该可以下载，可以把这四个性状也加到BayesS的分析之中
+
+```{bash, eval=FALSE}
+module load irods
+# login Cyverse
+iinit
+# input password.
+
+cd /common/jyanglab/shared/dbcenter/LWang
+irsync -rKV i:/iplant/home/lilepisorus/load60yearsBreeding/sampleGeno .
+
+/common/jyanglab/shared/dbcenter/LWang/
+
+irsync -rKV i:/iplant/home/lilepisorus/load60yearsBreeding/sampleInfo .
+```
+

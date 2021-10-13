@@ -1,0 +1,57 @@
+---
+title: "Li Wang's data: GTCB results from Gen Xu"
+output: NULL
+date: 05-206-2021
+---
+
+Hi, Jinliang
+I just shared with you the phenotype and genotype data of 350 inbred lines and 120 hybrids on cyverse.
+Genotypes are here: /iplant/home/lilepisorus/load60yearsBreeding/sampleGeno （notes.txt file in the directory gives some notes of the shared files）
+Phenotypes are here: /iplant/home/lilepisorus/load60yearsBreeding/sampleInfo 
+You could also give me your student’s cyverse id / email address. I will give him/her access to the folders
+Appreciate your contributions!
+Best
+Li
+
+
+
+
+```{r setup, include=TRUE}
+#setwd("~/Documents/Github/pvpDiallel/")
+knitr::opts_knit$set(root.dir=normalizePath('../../'))
+```
+
+### format phenotype for GCTB
+
+/common/jyanglab/shared/Gen_Xu/350PVP_GCTB/Results
+
+```{r, eval=FALSE}
+get_gctb_parres <- function(path="largedata/bayesS"){
+  # df: must contain "FID" (family id), "IID" (individual id)
+  # cols: the idx of the phenotype columns
+  
+  files <- list.files(path, pattern="parRes", full.names = TRUE)
+  message(sprintf("###>>> [%s] files detected!", length(files)))
+  
+  res <- data.frame()
+  for(i in 1:length(files)){
+    ### read in the file by skip the first two rows:
+    pres <- read.table(files[i], skip = 2)
+    pres$par <- row.names(pres)
+    pres$file <- files[i]
+    pres$trait <- gsub(".*/|.parRes", "", pres$file)
+    res <- rbind(res, pres)
+  }
+  return(res)
+}
+
+### get results:
+out1 <- get_gctb_parres(path="/common/jyanglab/shared/Gen_Xu/350PVP_GCTB/Results")
+
+out2 <- get_gctb_parres(path="/common/jyanglab/shared/Gen_Xu/350PVP_GCTB/Results/Yield_traits")
+
+out <- rbind(out1, out2)
+write.table(out, "cache/PVP350_gctb_res.csv", sep=",", row.names=FALSE, quote=FALSE)
+
+```
+
